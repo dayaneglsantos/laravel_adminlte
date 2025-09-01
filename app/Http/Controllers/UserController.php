@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -71,6 +72,21 @@ class UserController extends Controller
 
         $user->update($input);
         return redirect()->route('users.index')->with('status', 'Usuário atualizado com sucesso!'); // redireciona para a lista de usuários com uma mensagem de sucesso
+    }
+
+    public function updateProfile(Request $request, string $id)
+    {
+        $input = $request->validate([
+            'type' => 'required',
+            'address' => 'nullable'
+        ]);
+
+        UserProfile::updateOrCreate(
+            ['user_id' => $id], // critério de busca
+            $input
+        );
+
+        return redirect()->route('users.index')->with('status', 'Perfil atualizado com sucesso!');
     }
 
     /**

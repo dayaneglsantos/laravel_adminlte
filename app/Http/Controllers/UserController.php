@@ -52,7 +52,8 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+        return view('users.edit', compact('user'));
     }
 
     /**
@@ -60,7 +61,16 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $user = User::findOrFail($id);
+
+        $input = $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|email|unique:users,email,' . $user->id, // Ignora o email do usuário atual na verificação de unicidade
+            'password' => 'exclude_if:password,null|string|min:8' // Exclui a validação se a senha não foi alterada
+        ]);
+
+        $user->update($input);
+        return redirect()->route('users.index')->with('status', 'Usuário atualizado com sucesso!'); // redireciona para a lista de usuários com uma mensagem de sucesso
     }
 
     /**
@@ -68,6 +78,8 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+        $user->delete();
+        return redirect()->route('users.index')->with('status', 'Usuário excluído com sucesso!'); // redireciona para a lista de usuários com uma mensagem de sucesso
     }
 }

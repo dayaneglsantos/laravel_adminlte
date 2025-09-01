@@ -141,7 +141,7 @@
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                     <img src="{{ Vite::asset('resources/images/user2-160x160.jpg') }}"
                         class="user-image rounded-circle shadow" alt="User Image" />
-                    <span class="d-none d-md-inline">Alexander Pierce</span>
+                    <span class="d-none d-md-inline">{{ Auth::user()->name }}</span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
                     <!--begin::User Image-->
@@ -150,7 +150,7 @@
                             class="rounded-circle
                                     shadow" alt="User Image" />
                         <p>
-                            Alexander Pierce - Web Developer
+                            {{ Auth::user()->name }}
                             <small>Member since Nov. 2023</small>
                         </p>
                     </li>

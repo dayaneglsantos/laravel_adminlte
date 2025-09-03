@@ -54,6 +54,7 @@ class UserController extends Controller
     public function edit(string $id)
     {
         $user = User::findOrFail($id);
+        $user->load('profile', 'interests');
         return view('users.edit', compact('user'));
     }
 
@@ -87,6 +88,24 @@ class UserController extends Controller
         );
 
         return redirect()->route('users.index')->with('status', 'Perfil atualizado com sucesso!');
+    }
+
+    public function updateInterests(Request $request, string $id)
+    {
+
+        $user = User::findOrFail($id);
+
+        $input = $request->validate([
+            'interests' => 'nullable|array',
+        ]);
+
+        $user->interests()->delete(); // Remove interesses antigos
+
+        if (!empty($input['interests'])) {
+            $user->interests()->createMany($input['interests']); // Adiciona os novos interesses
+        }
+
+        return redirect()->route('users.index')->with('status', 'Interesses atualizados com sucesso!');
     }
 
     /**

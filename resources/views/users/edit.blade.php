@@ -5,4 +5,6 @@
     @include('users.parts.basic-infos')
     <br>
     @include('users.parts.profile')
+    <br>
+    @include('users.parts.interest')
 @endsection

@@ -16,4 +16,5 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 
     Route::put('users/{id}/profile', [UserController::class, 'updateProfile'])->name('users.updateProfile');
+    Route::put('users/{id}/interests', [UserController::class, 'updateInterests'])->name('users.updateInterests');
 });

@@ -50,4 +50,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserProfile::class);
     }
+
+    public function interests()
+    {
+        return $this->hasMany(UserInterest::class);
+    }
 }

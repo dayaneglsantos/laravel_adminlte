@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Http\Request;
@@ -13,7 +14,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        $users = User::paginate();
         return view('users.index', compact('users')); // se houvessem mais variáveis, poderiam ser adicionadas no compact e elas estariam disponíveis na view
     }
 
@@ -54,8 +55,10 @@ class UserController extends Controller
     public function edit(string $id)
     {
         $user = User::findOrFail($id);
+        $roles = Role::all();
+
         $user->load('profile', 'interests');
-        return view('users.edit', compact('user'));
+        return view('users.edit', compact('user', 'roles'));
     }
 
     /**
@@ -64,6 +67,7 @@ class UserController extends Controller
     public function update(Request $request, string $id)
     {
         $user = User::findOrFail($id);
+
 
         $input = $request->validate([
             'name' => 'required|string',
@@ -106,6 +110,19 @@ class UserController extends Controller
         }
 
         return redirect()->route('users.index')->with('status', 'Interesses atualizados com sucesso!');
+    }
+
+    public function updateRoles(Request $request, string $id)
+    {
+
+        $user = User::findOrFail($id);
+        $input = $request->validate([
+            'roles' => 'required|array',
+        ]);
+        $user->roles()->sync($input['roles']);
+
+
+        return back()->with('status', 'Cargo atualizado com sucesso!');
     }
 
     /**

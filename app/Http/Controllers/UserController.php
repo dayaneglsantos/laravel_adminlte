@@ -6,15 +6,26 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::paginate();
+        $users = User::query(); // Inicia a query builder
+
+        $users->when($request->search, function ($query, $search) { // Aplica o filtro de busca se houver
+            $query->where(function ($q) use ($search) { // usamos o use para passar a variável $search para dentro da closure
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        });
+
+        $users = $users->paginate(); // Pagina os resultados, 15 por padrão
+
         return view('users.index', compact('users')); // se houvessem mais variáveis, poderiam ser adicionadas no compact e elas estariam disponíveis na view
     }
 
@@ -54,6 +65,8 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
+        Gate::authorize('edit', User::class); // Verifica se o usuário autenticado tem permissão para editar usuários
+
         $user = User::findOrFail($id);
         $roles = Role::all();
 
@@ -66,6 +79,8 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        Gate::authorize('edit', User::class);
+
         $user = User::findOrFail($id);
 
 
@@ -81,6 +96,8 @@ class UserController extends Controller
 
     public function updateProfile(Request $request, string $id)
     {
+        Gate::authorize('edit', User::class);
+
         $input = $request->validate([
             'type' => 'required',
             'address' => 'nullable'
@@ -96,6 +113,7 @@ class UserController extends Controller
 
     public function updateInterests(Request $request, string $id)
     {
+        Gate::authorize('edit', User::class);
 
         $user = User::findOrFail($id);
 
@@ -114,6 +132,7 @@ class UserController extends Controller
 
     public function updateRoles(Request $request, string $id)
     {
+        Gate::authorize('edit', User::class);
 
         $user = User::findOrFail($id);
         $input = $request->validate([
@@ -130,6 +149,8 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
+        Gate::authorize('destroy', User::class);
+
         $user = User::findOrFail($id);
         $user->delete();
         return redirect()->route('users.index')->with('status', 'Usuário excluído com sucesso!'); // redireciona para a lista de usuários com uma mensagem de sucesso
